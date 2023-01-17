@@ -1,6 +1,8 @@
 // Modification du titre de la page
 
-document.title = "Votre panier Kanap";
+document.title = "Votre panier - Kanap";
+
+// Constante pour l'emplacement des produits 
 
 const cartItem = document.getElementById("cart__items");
 
@@ -27,7 +29,7 @@ fetch("http://localhost:3000/api/products")
       let productQuantityCart = cart[i].quantity;
       console.log(productQuantityCart);
 
-      // Recherche du produit présent dans le panier dans l'API
+      // Recherche de l'id des produits dans l'API
       const fullCart = data.find((element) => element._id === productIdCart);
 
       // Création des éléments HTML
@@ -66,7 +68,8 @@ fetch("http://localhost:3000/api/products")
       newDivInfoDescription.appendChild(newPforColor);
 
       let newPforPrice = document.createElement("p");
-      newPforPrice.textContent = fullCart.price + " €";
+      newPforPrice.setAttribute("id", "itemPrice");
+      newPforPrice.textContent = fullCart.price + `€`;
       newDivInfoDescription.appendChild(newPforPrice);
 
       let newDivForContentSettings = document.createElement("div");
@@ -110,10 +113,146 @@ fetch("http://localhost:3000/api/products")
     }
   });
 
- //  <div class="cart__price">
- // <p>Total (<span id="totalQuantity">2</span> articles) : <span id="totalPrice">84,00 </span> €</p>
- // </div>
+// Calcul du nombre d'articles dans le panier
+let totalQuantity = 0;
+document.getElementById("totalQuantity").textContent = totalQuantity;
 
- // Calcul du prix total du panier
+for (let i = 0; i < cart.length; i++) {
+  let productQuantityCart = cart[i].quantity;
+  totalQuantity += parseInt(productQuantityCart);
+  console.log(totalQuantity);
 
+  let totalQuantityCart = document.getElementById("totalQuantity");
+  totalQuantityCart.textContent = totalQuantity;
+}
+// Calcul du prix total du panier
 
+let totalPrice = 0;
+for (let i = 0; i < cart.length; i++) {
+  let productIdCart = cart[i].id;
+  let productQuantityCart = cart[i].quantity;
+
+  fetch("http://localhost:3000/api/products")
+    .then((response) => response.json())
+    .then((data) => {
+      const fullCart = data.find((element) => element._id === productIdCart);
+      totalPrice += fullCart.price * productQuantityCart;
+      console.log(totalPrice);
+
+      let totalPriceCart = document.getElementById("totalPrice");
+      totalPriceCart.textContent = totalPrice;
+    });
+}
+
+// Fonction pour modifier la quantité d'un article
+
+addEventListener("change", (e) => {
+  e.preventDefault();
+  if (e.target.classList.contains("itemQuantity")) {
+    let product = e.target.closest(".cart__item");
+    let productId = product.dataset.id;
+    let productColor = product.dataset.color;
+    let productQuantity = e.target.value;
+
+    for (let i = 0; i < cart.length; i++) {
+      if (cart[i].id === productId && cart[i].color === productColor) {
+        cart[i].quantity = productQuantity;
+      }
+    }
+    localStorage.setItem("cart", JSON.stringify(cart));
+    updateChange();
+  }
+});
+
+function updateChange() {
+  let itemQuantity = document.getElementsByClassName("itemQuantity");
+  let totalQuantity = 0;
+  for (let i = 0; i < itemQuantity.length; i++) {
+    totalQuantity += parseInt(itemQuantity[i].value);
+  }
+  let totalQuantityBis = document.getElementById("totalQuantity");
+  totalQuantityBis.innerHTML = totalQuantity;
+
+  let totalPrice = 0;
+  for (let i = 0; i < cart.length; i++) {
+    let productIdCart = cart[i].id;
+    let productQuantityCart = cart[i].quantity;
+
+    fetch("http://localhost:3000/api/products")
+      .then((response) => response.json())
+      .then((data) => {
+        const fullCart = data.find((element) => element._id === productIdCart);
+        totalPrice += fullCart.price * productQuantityCart;
+        console.log(totalPrice);
+
+        let totalPriceCart = document.getElementById("totalPrice");
+        totalPriceCart.textContent = totalPrice;
+      });
+  }
+}
+
+// Fonction pour supprimer un article du panier
+
+addEventListener("click", (deleteItem) => {
+  if (deleteItem.target.classList.contains("deleteItem")) {
+    let product = deleteItem.target.closest(".cart__item");
+    let productId = product.dataset.id;
+    let productColor = product.dataset.color;
+
+    for (let i = 0; i < cart.length; i++) {
+      if (cart[i].id === productId && cart[i].color === productColor) {
+        cart.splice(i, 1);
+      }
+    }
+    product.remove();
+    localStorage.setItem("cart", JSON.stringify(cart));
+    updateChange();
+  }
+});
+
+// Passer la commande avec le formulaire
+
+let orderForm = document.querySelector("form");
+
+orderForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  let contact = {
+    firstName: document.getElementById("firstName").value,
+    lastName: document.getElementById("lastName").value,
+    address: document.getElementById("address").value,
+    city: document.getElementById("city").value,
+    email: document.getElementById("email").value,
+  };
+  console.log(contact);
+
+  let products = [];
+  for (let i = 0; i < cart.length; i++) {
+    products.push(cart[i].id);
+  }
+
+  let order = {
+    contact,
+    products,
+  };
+  console.log(order);
+
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(order),
+  };
+
+  fetch("http://localhost:3000/api/products/order", options)
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      console.log(data);
+      document.location.href = "confirmation.html?orderId=" + data.orderId;
+    });
+
+  localStorage.clear(cart);
+});

@@ -1,4 +1,4 @@
-// Selection de l'emplacement ou on va afficher nos produits
+// Selection de l'emplacement les produits vont s'afficher 
 const itemsList = document.querySelector("#items");
 
 // Récupération des différents élements que contient un produit sur la page d'accueil
