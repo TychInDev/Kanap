@@ -2,9 +2,12 @@
 
 document.title = "Votre panier - Kanap";
 
-// Constante pour l'emplacement des produits 
+// Constante pour l'emplacement des produits
 
-const cartItem = document.getElementById("cart__items");
+const cartItems = document.getElementById("cart__items");
+
+let totalPrice = 0;
+document.getElementById("totalPrice").textContent = totalPrice;
 
 // Récupération du panier dans le localStorage
 
@@ -30,22 +33,22 @@ fetch("http://localhost:3000/api/products")
       console.log(productQuantityCart);
 
       // Recherche de l'id des produits dans l'API
-      const fullCart = data.find((element) => element._id === productIdCart);
+      const fullProduct = data.find((element) => element._id === productIdCart);
 
       // Création des éléments HTML
       let newArticle = document.createElement("article");
       newArticle.setAttribute("class", "cart__item");
-      newArticle.setAttribute("data-id", `${productIdCart}`);
-      newArticle.setAttribute("data-color", `${productColorCart}`);
-      cartItem.appendChild(newArticle);
+      newArticle.setAttribute("data-id", productIdCart);
+      newArticle.setAttribute("data-color", productColorCart);
+      cartItems.appendChild(newArticle);
 
       let newDivForImg = document.createElement("div");
       newDivForImg.setAttribute("class", "cart__item__img");
       newArticle.appendChild(newDivForImg);
 
       let newImg = document.createElement("img");
-      newImg.setAttribute("src", fullCart.imageUrl);
-      newImg.setAttribute("alt", fullCart.altTxt);
+      newImg.setAttribute("src", fullProduct.imageUrl);
+      newImg.setAttribute("alt", fullProduct.altTxt);
       newDivForImg.appendChild(newImg);
 
       let newDivInfo = document.createElement("div");
@@ -60,7 +63,7 @@ fetch("http://localhost:3000/api/products")
       newDivInfo.appendChild(newDivInfoDescription);
 
       let newH2 = document.createElement("h2");
-      newH2.textContent = fullCart.name;
+      newH2.textContent = fullProduct.name;
       newDivInfoDescription.appendChild(newH2);
 
       let newPforColor = document.createElement("p");
@@ -69,7 +72,7 @@ fetch("http://localhost:3000/api/products")
 
       let newPforPrice = document.createElement("p");
       newPforPrice.setAttribute("id", "itemPrice");
-      newPforPrice.textContent = fullCart.price + `€`;
+      newPforPrice.textContent = `${fullProduct.price}€`;
       newDivInfoDescription.appendChild(newPforPrice);
 
       let newDivForContentSettings = document.createElement("div");
@@ -127,7 +130,8 @@ for (let i = 0; i < cart.length; i++) {
 }
 // Calcul du prix total du panier
 
-let totalPrice = 0;
+// let totalPrice = 0;
+
 for (let i = 0; i < cart.length; i++) {
   let productIdCart = cart[i].id;
   let productQuantityCart = cart[i].quantity;
@@ -135,8 +139,8 @@ for (let i = 0; i < cart.length; i++) {
   fetch("http://localhost:3000/api/products")
     .then((response) => response.json())
     .then((data) => {
-      const fullCart = data.find((element) => element._id === productIdCart);
-      totalPrice += fullCart.price * productQuantityCart;
+      const fullProduct = data.find((element) => element._id === productIdCart);
+      totalPrice += fullProduct.price * productQuantityCart;
       console.log(totalPrice);
 
       let totalPriceCart = document.getElementById("totalPrice");
@@ -181,8 +185,8 @@ function updateChange() {
     fetch("http://localhost:3000/api/products")
       .then((response) => response.json())
       .then((data) => {
-        const fullCart = data.find((element) => element._id === productIdCart);
-        totalPrice += fullCart.price * productQuantityCart;
+        const fullProduct = data.find((element) => element._id === productIdCart);
+        totalPrice += fullProduct.price * productQuantityCart;
         console.log(totalPrice);
 
         let totalPriceCart = document.getElementById("totalPrice");
@@ -205,8 +209,10 @@ addEventListener("click", (deleteItem) => {
       }
     }
     product.remove();
-    localStorage.setItem("cart", JSON.stringify(cart));
     updateChange();
+    let totalPrice = 0;
+    document.getElementById("totalPrice").textContent = totalPrice;
+    localStorage.setItem("cart", JSON.stringify(cart));
   }
 });
 

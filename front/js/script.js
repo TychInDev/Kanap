@@ -10,7 +10,7 @@ fetch("http://localhost:3000/api/products")
 
       // Création des éléments HTML
       let newA = document.createElement("a");
-      newA.setAttribute("href", './product.html?id=' + productsList._id);
+      newA.setAttribute("href", `./product.html?id=` + productsList._id);
       itemsList.appendChild(newA);
 
       let newArticle = document.createElement("article");

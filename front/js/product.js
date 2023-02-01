@@ -10,7 +10,7 @@ fetch("http://localhost:3000/api/products/" + idProduct)
   .then((productPage) => {
     console.log(productPage);
 
-    // Implémentation des données du produit sur la page 
+    // Implémentation des données du produit sur la page
 
     document.title = productPage.name;
 
@@ -62,27 +62,26 @@ addToCart.addEventListener("click", (event) => {
     return;
   }
 
-  // Création du panier dans le local storage et ajout des produits
-
+  // Création du panier dans le local storage et ajout des produits au panier 
   let cart = JSON.parse(localStorage.getItem("cart"));
   console.log(cart);
 
+  // Verification si le produit est déjà dans le panier et ajout de la quantité si le produit est déjà présent
   if (cart) {
-    let productAlreadyInCart = false;
-    for (let i = 0; i < cart.length; i++) {
-      if (cart[i].id === product.id && cart[i].color === product.color) {
-        cart[i].quantity =
-          parseInt(cart[i].quantity) + parseInt(product.quantity);
-        productAlreadyInCart = true;
-      }
-    }
-    if (!productAlreadyInCart) {
+    let productInCart = cart.find(
+      (item) => item.id === product.id && item.color === product.color
+    );
+    if (productInCart) {
+      productInCart.quantity =
+        parseInt(productInCart.quantity) + parseInt(product.quantity);
+    } else {
       cart.push(product);
-      document.location.href = "cart.html";
     }
   } else {
     cart = [product];
   }
+
   localStorage.setItem("cart", JSON.stringify(cart));
   console.log(cart);
+  document.location.href = "cart.html";
 });
