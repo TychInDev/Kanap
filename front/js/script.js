@@ -1,34 +1,33 @@
-// Selection de l'emplacement les produits vont s'afficher 
+// Selection de l'emplacement ou les produits vont s'afficher 
 const itemsList = document.querySelector("#items");
 
 // Récupération des différents élements que contient un produit sur la page d'accueil
 fetch("http://localhost:3000/api/products")
   .then((response) => response.json())
   .then((data) => {
-    for (const productsList of data) {
-      console.log(productsList);
-
+    for (const product of data) {
+      
       // Création des éléments HTML
       let newA = document.createElement("a");
-      newA.setAttribute("href", `./product.html?id=` + productsList._id);
+      newA.setAttribute("href", `./product.html?id=` + product._id);
       itemsList.appendChild(newA);
 
       let newArticle = document.createElement("article");
       newA.appendChild(newArticle);
 
       let newImg = document.createElement("img");
-      newImg.setAttribute("src", productsList.imageUrl);
-      newImg.setAttribute("alt", productsList.altTxt);
+      newImg.setAttribute("src", product.imageUrl);
+      newImg.setAttribute("alt", product.altTxt);
       newArticle.appendChild(newImg);
 
       let newH3 = document.createElement("h3");
       newH3.setAttribute("class", "productName");
-      newH3.textContent = productsList.name;
+      newH3.textContent = product.name;
       newArticle.appendChild(newH3);
 
       let newP = document.createElement("p");
       newP.setAttribute("class", "productDescription");
-      newP.textContent = productsList.description;
+      newP.textContent = product.description;
       newArticle.appendChild(newP);
     }
   })
