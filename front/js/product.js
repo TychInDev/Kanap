@@ -4,10 +4,9 @@ const idProduct = new URLSearchParams(window.location.search).get("id");
 
 // Récuperation des données du produit
 
-fetch("http://localhost:3000/api/products/" + idProduct)
+fetch(`http://localhost:3000/api/products/${idProduct}`)
   .then((response) => response.json())
   .then((productPage) => {
-
     // Implémentation des données du produit sur la page
 
     document.title = productPage.name;
@@ -51,7 +50,7 @@ addToCart.addEventListener("click", (event) => {
     return;
   }
 
-  // Création du panier dans le local storage et ajout des produits au panier 
+  // Création du panier dans le local storage et ajout des produits au panier
   let cart = JSON.parse(localStorage.getItem("cart"));
 
   // Verification si le produit est déjà dans le panier et ajout de la quantité si le produit est déjà présent

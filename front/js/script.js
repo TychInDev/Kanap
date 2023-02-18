@@ -9,7 +9,7 @@ fetch("http://localhost:3000/api/products")
       
       // Création des éléments HTML
       let newA = document.createElement("a");
-      newA.setAttribute("href", `./product.html?id=` + product._id);
+      newA.setAttribute("href", `./product.html?id=${product._id}`);
       itemsList.appendChild(newA);
 
       let newArticle = document.createElement("article");
@@ -32,5 +32,5 @@ fetch("http://localhost:3000/api/products")
     }
   })
   .catch((error) => {
-    alert("Une erreur s'est produite: " + error);
+    alert(`Une erreur s'est produite: ${error}`);
   });
