@@ -15,16 +15,16 @@ fetch(`http://localhost:3000/api/products/${idProduct}`)
     productImg.setAttribute("src", productPage.imageUrl);
     productImg.setAttribute("alt", productPage.altTxt);
 
-    let productName = document.querySelector(".item__content h1");
+    let productName = document.getElementById("title");
     productName.textContent = productPage.name;
 
-    let productPrice = document.querySelector("#price");
+    let productPrice = document.getElementById("price");
     productPrice.textContent = productPage.price;
 
-    let productDescription = document.querySelector("#description");
+    let productDescription = document.getElementById("description");
     productDescription.textContent = productPage.description;
 
-    let choiceColors = document.querySelector("#colors");
+    let choiceColors = document.getElementById("colors");
     choiceColors.innerHTML = productPage.colors.map(
       (color) => `<option value="${color}">${color}</option>`
     );
@@ -32,12 +32,12 @@ fetch(`http://localhost:3000/api/products/${idProduct}`)
 
 // Recuperation des données du produit ( id, couleur, prix et quantité)
 
-let addToCart = document.querySelector("#addToCart");
+let addToCart = document.getElementById("addToCart");
 
 addToCart.addEventListener("click", (event) => {
-  let productQuantity = document.querySelector("#quantity");
+  let productQuantity = document.getElementById("quantity");
 
-  let productColor = document.querySelector("#colors");
+  let productColor = document.getElementById("colors");
 
   let product = {
     id: idProduct,

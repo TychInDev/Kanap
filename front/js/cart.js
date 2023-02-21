@@ -110,9 +110,6 @@ fetch("http://localhost:3000/api/products")
 
 // Affichage du nombre d'articles dans le panier
 
-let totalQuantityDisplay = document.getElementById("totalQuantity");
-totalQuantityDisplay.textContent = cart.length;
-
 function cartQuantity() {
   let cartQuantity = document.getElementById("totalQuantity");
 
@@ -152,54 +149,55 @@ function cartTotalPrice() {
 }
 cartTotalPrice();
 
-// Modifier la quantité d'un article
-
+// Modification de la quantité et suppression d'un article dans le panier
 window.addEventListener("load", () => {
-  const itemQuantityInput = document.querySelector(".itemQuantity");
+  const itemQuantityInputs = document.getElementsByClassName("itemQuantity");
+  const deleteItemInCarts = document.getElementsByClassName("deleteItem");
 
-  itemQuantityInput.addEventListener("change", (event) => {
-    let quantity = event.target.value;
-    let article = event.target.closest(".cart__item");
-    let id = article.dataset.id;
-    let color = article.dataset.color;
+  // Modification de la quantité d'un article dans le panier
+  Array.from(itemQuantityInputs).forEach(itemQuantityInput => {
+    itemQuantityInput.addEventListener("change", (event) => {
+      let quantity = event.target.value;
+      let article = event.target.closest(".cart__item");
+      let id = article.dataset.id;
+      let color = article.dataset.color;
 
-    for (let i = 0; i < cart.length; i++) {
-      if (cart[i].id === id && cart[i].color === color) {
-        cart[i].quantity = quantity;
+      for (let i = 0; i < cart.length; i++) {
+        if (cart[i].id === id && cart[i].color === color) {
+          cart[i].quantity = quantity;
+        }
       }
-    }
 
-    localStorage.setItem("cart", JSON.stringify(cart));
-    cartQuantity();
-    cartTotalPrice();
+      localStorage.setItem("cart", JSON.stringify(cart));
+      cartQuantity();
+      cartTotalPrice();
+    });
+  });
+
+  // Suppression d'un article dans le panier
+  Array.from(deleteItemInCarts).forEach(deleteItemInCart => {
+    deleteItemInCart.addEventListener("click", (event) => {
+      let article = event.target.closest(".cart__item");
+      let id = article.dataset.id;
+      let color = article.dataset.color;
+
+      for (let i = 0; i < cart.length; i++) {
+        if (cart[i].id === id && cart[i].color === color) {
+          cart.splice(i, 1);
+        }
+        if (cart.length === 0) {
+          let totalPrice = document.getElementById("totalPrice");
+          totalPrice.textContent = 0;
+        }
+      }
+      localStorage.setItem("cart", JSON.stringify(cart));
+      article.remove();
+      cartQuantity();
+      cartTotalPrice();
+    });
   });
 });
 
-// Suppression d'un article
-
-window.addEventListener("load", () => {
-  const deleteItemInCart = document.querySelector(".deleteItem");
-
-  deleteItemInCart.addEventListener("click", (event) => {
-    let article = event.target.closest(".cart__item");
-    let id = article.dataset.id;
-    let color = article.dataset.color;
-
-    for (let i = 0; i < cart.length; i++) {
-      if (cart[i].id === id && cart[i].color === color) {
-        cart.splice(i, 1);
-      }
-      if (cart.length === 0) {
-        let totalPrice = document.getElementById("totalPrice");
-        totalPrice.textContent = 0;
-      }
-    }
-    localStorage.setItem("cart", JSON.stringify(cart));
-    article.remove();
-    cartQuantity();
-    cartTotalPrice();
-  });
-});
 
 // Validation du formulaire et envoi de la commande
 
