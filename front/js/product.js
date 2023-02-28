@@ -1,11 +1,16 @@
-// Récuperation de l'id du produit dans l'url
+// Récupération de l'id du produit dans l'URL
 
 const idProduct = new URLSearchParams(window.location.search).get("id");
 
-// Récuperation des données du produit
+// Récupération des données du produit
 
 fetch(`http://localhost:3000/api/products/${idProduct}`)
-  .then((response) => response.json())
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error("Erreur lors de la récupération des données du produit");
+    }
+    return response.json();
+  })
   .then((productPage) => {
     // Implémentation des données du produit sur la page
 
@@ -28,9 +33,15 @@ fetch(`http://localhost:3000/api/products/${idProduct}`)
     choiceColors.innerHTML = productPage.colors.map(
       (color) => `<option value="${color}">${color}</option>`
     );
+  })
+  .catch((error) => {
+    let addToCartButton = document.getElementById("addToCart");
+    addToCartButton.remove();
+   
+    alert("Ce produit n'existe pas");
   });
 
-// Recuperation des données du produit ( id, couleur, prix et quantité)
+// Récupération des données du produit (id, couleur, prix et quantité)
 
 let addToCart = document.getElementById("addToCart");
 
@@ -45,15 +56,15 @@ addToCart.addEventListener("click", (event) => {
     quantity: productQuantity.value,
   };
 
-  if (product.quantity > 100) {
-    alert("La quantité ne peut pas dépasser 100.");
+  if (product.quantity < 1 || product.quantity > 100) {
+    alert("La quantité doit être comprise entre 1 et 100.");
     return;
   }
 
   // Création du panier dans le local storage et ajout des produits au panier
   let cart = JSON.parse(localStorage.getItem("cart"));
 
-  // Verification si le produit est déjà dans le panier et ajout de la quantité si le produit est déjà présent
+  // Vérification si le produit est déjà dans le panier et ajout de la quantité si le produit est déjà présent
   if (cart) {
     let productInCart = cart.find(
       (item) => item.id === product.id && item.color === product.color

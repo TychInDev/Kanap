@@ -2,6 +2,15 @@
 
 document.title = "Votre panier - Kanap";
 
+let quantityDisplay = document.getElementById("totalQuantity");
+quantityDisplay.textContent = 0;
+
+let priceDisplay = document.getElementById("totalPrice");
+priceDisplay.textContent = 0;
+
+let messageError = document.getElementById("firstNameErrorMsg");
+messageError.textContent = "";
+
 // Selection de l'emplacement des produits
 
 const cartItems = document.getElementById("cart__items");
@@ -111,15 +120,14 @@ fetch("http://localhost:3000/api/products")
 // Affichage du nombre d'articles dans le panier
 
 function cartQuantity() {
-  let cartQuantity = document.getElementById("totalQuantity");
-
-  let totalQuantity = 0;
-  for (let i = 0; i < cart.length; i++) {
-    totalQuantity += parseInt(cart[i].quantity);
+   let cartQuantity = document.getElementById("totalQuantity");
+   let totalQuantity = 0;
+   for (let i = 0; i < cart.length; i++) {
+     totalQuantity += parseInt(cart[i].quantity);
   }
-  cartQuantity.textContent = totalQuantity;
-}
-cartQuantity();
+   cartQuantity.textContent = totalQuantity;
+ }
+ cartQuantity();
 
 // Affichage du prix total du panier
 
@@ -129,23 +137,24 @@ totalPriceDisplay.textContent = 0;
 function cartTotalPrice() {
   let cartTotalPrice = document.getElementById("totalPrice");
   let totalPrice = 0;
+  let productsContent;
 
-  for (let i = 0; i < cart.length; i++) {
-    fetch("http://localhost:3000/api/products")
-      .then((response) => response.json())
-      .then((data) => {
-        productsContent = data;
+  fetch("http://localhost:3000/api/products")
+    .then((response) => response.json())
+    .then((data) => {
+      productsContent = data;
 
-        let productIdCart = cart[i].id;
+      cart.forEach((item) => {
+        let productIdCart = item.id;
 
-        const fullProduct = data.find(
+        const fullProduct = productsContent.find(
           (element) => element._id === productIdCart
         );
-        totalPrice += fullProduct.price * cart[i].quantity;
-
-        cartTotalPrice.textContent = totalPrice;
+        totalPrice += fullProduct.price * item.quantity;
       });
-  }
+
+      cartTotalPrice.textContent = totalPrice;
+    });
 }
 cartTotalPrice();
 
@@ -155,7 +164,7 @@ window.addEventListener("load", () => {
   const deleteItemInCarts = document.getElementsByClassName("deleteItem");
 
   // Modification de la quantité d'un article dans le panier
-  Array.from(itemQuantityInputs).forEach(itemQuantityInput => {
+  Array.from(itemQuantityInputs).forEach((itemQuantityInput) => {
     itemQuantityInput.addEventListener("change", (event) => {
       let quantity = event.target.value;
       let article = event.target.closest(".cart__item");
@@ -175,7 +184,7 @@ window.addEventListener("load", () => {
   });
 
   // Suppression d'un article dans le panier
-  Array.from(deleteItemInCarts).forEach(deleteItemInCart => {
+  Array.from(deleteItemInCarts).forEach((deleteItemInCart) => {
     deleteItemInCart.addEventListener("click", (event) => {
       let article = event.target.closest(".cart__item");
       let id = article.dataset.id;
@@ -198,7 +207,6 @@ window.addEventListener("load", () => {
   });
 });
 
-
 // Validation du formulaire et envoi de la commande
 
 const firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
@@ -208,6 +216,19 @@ let form = document.querySelector("form");
 
 form.addEventListener("submit", function (e) {
   e.preventDefault();
+
+  if (cart.length === 0) {
+    alert("Votre panier est vide");
+  } 
+  
+  if  (
+    validateInfo(form.firstName, /^[a-zA-Z]+$/, "Le prénom n'est pas valide") &&
+    validateInfo(form.lastName, /^[a-zA-Z]+$/, "Le nom n'est pas valide") &&
+    validateInfo(form.address, /^[0-9]+\s[a-zA-Z\s]+$/, "L'adresse n'est pas valide") &&
+    validateInfo(form.city, /^[a-zA-Z]+$/, "La ville n'est pas valide") &&
+    validateInfo(form.email, /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "L'email n'est pas valide")
+  ) 
+
   {
     let contact = {
       firstName: form.firstName.value,
@@ -243,6 +264,9 @@ form.addEventListener("submit", function (e) {
         document.location.href = `confirmation.html?orderId=${data.orderId}`;
         localStorage.clear(cart);
       });
+  }
+  else {
+    alert("Veuillez remplir correctement le formulaire");
   }
 });
 
